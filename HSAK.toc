@@ -1,0 +1,12 @@
+## Interface: 11200
+## Title: Hardcordica Swiss Army Knife
+## Notes: Guild manager, group finder, alt tracker, dungeon journal..who can keep track of all the features..
+## Author: Paski, Minatour
+## Version: 1.5
+## Dependencies: 
+## SavedVariables: GuildManagerSettings, MainAltDB
+
+GuildManagerMapButton.lua
+GuildManager.lua
+AltTracker.lua
+Textures/Icon.blp
