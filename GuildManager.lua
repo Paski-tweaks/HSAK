@@ -104,18 +104,54 @@ local function UpdateRanks()
     end
 end
 
-local function ListInactiveMembers()
+local function PreviewInactiveMembers()
     local numMembers = GetNumGuildMembers()
+    local inactiveMembers = {}
+    
     for i = 1, numMembers do
-        local name, _, _, _, _, _, _, _, _, _, _, _, _, _ = GetGuildRosterInfo(i)
-        local yearsOffline, monthsOffline, daysOffline, hoursOffline = GetGuildRosterLastOnline(i)
+        local name, _, rankIndex, _, _, _, _, _, _, _, _, _, _, _ = GetGuildRosterInfo(i)
+        local yearsOffline, monthsOffline, daysOffline = GetGuildRosterLastOnline(i)
         local totalDaysOffline = (yearsOffline or 0) * 365 + (monthsOffline or 0) * 30 + (daysOffline or 0)
-        if totalDaysOffline > 30 then
-            AddMessage(name .. " has been offline for " .. totalDaysOffline .. " days.")
+        if totalDaysOffline > 30 and rankIndex ~= 3 then
+            table.insert(inactiveMembers, {name = name, daysOffline = totalDaysOffline})
         end
     end
+    local count = 0
+    for _ in pairs(inactiveMembers) do
+        count = count + 1
+    end
+    if count > 0 then
+        DEFAULT_CHAT_FRAME:AddMessage("The following " .. count .. " members are inactive for more than 30 days:")
+        for _, member in ipairs(inactiveMembers) do
+            DEFAULT_CHAT_FRAME:AddMessage("- " .. member.name .. " (" .. member.daysOffline .. " days offline)")
+        end
+        DEFAULT_CHAT_FRAME:AddMessage("Use '/confirmkick' to remove these members.")
+    else
+        DEFAULT_CHAT_FRAME:AddMessage("No inactive members found who meet the criteria.")
+    end
+    _G["InactiveMembersList"] = inactiveMembers
 end
 
+local function ConfirmKickInactiveMembers()
+    local inactiveMembers = _G["InactiveMembersList"]
+    if not inactiveMembers then
+        DEFAULT_CHAT_FRAME:AddMessage("No inactive members to kick. Use '/previewinactive' first.")
+        return
+    end
+    local count = 0
+    for _ in pairs(inactiveMembers) do
+        count = count + 1
+    end
+    if count == 0 then
+        DEFAULT_CHAT_FRAME:AddMessage("No inactive members to kick. Use '/previewinactive' first.")
+        return
+    end
+    for _, member in ipairs(inactiveMembers) do
+        GuildUninvite(member.name)
+        DEFAULT_CHAT_FRAME:AddMessage(member.name .. " has been kicked for being offline for " .. member.daysOffline .. " days.")
+    end
+    _G["InactiveMembersList"] = nil
+end
 
 --LFG
 local function WhisperForDungeon(dungeonName)
@@ -186,3 +222,12 @@ SlashCmdList["LFG"] = function(msg)
     end
 end
 
+SLASH_PREVIEWINACTIVE1 = "/previewinactive"
+SlashCmdList["PREVIEWINACTIVE"] = function()
+    PreviewInactiveMembers()
+end
+
+SLASH_CONFIRMKICK1 = "/confirmkick"
+SlashCmdList["CONFIRMKICK"] = function()
+    ConfirmKickInactiveMembers()
+end
