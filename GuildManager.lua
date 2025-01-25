@@ -104,6 +104,8 @@ local function UpdateRanks()
     end
 end
 
+local InactiveMembersList
+
 local function PreviewInactiveMembers()
     local numMembers = GetNumGuildMembers()
     local inactiveMembers = {}
@@ -112,8 +114,8 @@ local function PreviewInactiveMembers()
         local name, _, rankIndex, _, _, _, _, _, _, _, _, _, _, _ = GetGuildRosterInfo(i)
         local yearsOffline, monthsOffline, daysOffline = GetGuildRosterLastOnline(i)
         local totalDaysOffline = (yearsOffline or 0) * 365 + (monthsOffline or 0) * 30 + (daysOffline or 0)
-        if totalDaysOffline > 30 and rankIndex ~= 3 then
-            table.insert(inactiveMembers, {name = name, daysOffline = totalDaysOffline})
+        if totalDaysOffline > 30 and not excludedRanks[rankIndex] and rankIndex ~= 3 then
+            table.insert(inactiveMembers, {name = name, daysOffline = totalDaysOffline, rankIndex = rankIndex})
         end
     end
     local count = 0
@@ -129,28 +131,31 @@ local function PreviewInactiveMembers()
     else
         DEFAULT_CHAT_FRAME:AddMessage("No inactive members found who meet the criteria.")
     end
-    _G["InactiveMembersList"] = inactiveMembers
+    InactiveMembersList = inactiveMembers
 end
 
 local function ConfirmKickInactiveMembers()
-    local inactiveMembers = _G["InactiveMembersList"]
-    if not inactiveMembers then
+    if not InactiveMembersList then
         DEFAULT_CHAT_FRAME:AddMessage("No inactive members to kick. Use '/previewinactive' first.")
         return
     end
     local count = 0
-    for _ in pairs(inactiveMembers) do
+    for _ in pairs(InactiveMembersList) do
         count = count + 1
     end
     if count == 0 then
         DEFAULT_CHAT_FRAME:AddMessage("No inactive members to kick. Use '/previewinactive' first.")
         return
     end
-    for _, member in ipairs(inactiveMembers) do
-        GuildUninvite(member.name)
-        DEFAULT_CHAT_FRAME:AddMessage(member.name .. " has been kicked for being offline for " .. member.daysOffline .. " days.")
+    for _, member in ipairs(InactiveMembersList) do
+        if not excludedRanks[member.rankIndex] and rankIndex ~= 3 then 
+            GuildUninvite(member.name)
+            DEFAULT_CHAT_FRAME:AddMessage(member.name .. " has been kicked for being offline for " .. member.daysOffline .. " days.")
+        else
+            DEFAULT_CHAT_FRAME:AddMessage(member.name .. " cannot be kicked because they are an officer.")
+        end
     end
-    _G["InactiveMembersList"] = nil
+    InactiveMembersList = nil
 end
 
 --LFG
