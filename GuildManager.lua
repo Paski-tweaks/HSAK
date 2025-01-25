@@ -149,7 +149,7 @@ local function ConfirmKickInactiveMembers()
     end
     for _, member in ipairs(InactiveMembersList) do
         if not excludedRanks[member.rankIndex] and rankIndex ~= 3 then 
-            GuildUninvite(member.name)
+            GuildUninviteByName(member.name)
             DEFAULT_CHAT_FRAME:AddMessage(member.name .. " has been kicked for being offline for " .. member.daysOffline .. " days.")
         else
             DEFAULT_CHAT_FRAME:AddMessage(member.name .. " cannot be kicked because they are an officer.")
