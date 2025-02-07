@@ -13,6 +13,11 @@ local excludedRanks = {
     [2] = true  
 }
 
+local fixedRanks = {
+    ["Minaelfkica"] = 1,
+    ["Fubar"] = 8
+}
+
 local dungeonLevelRanges = {
     {name = "rfc", min = 14, max = 20},
     {name = "dm", min = 18, max = 25},
@@ -73,6 +78,11 @@ local function DetermineRankIndex(level, name)
     if not name or type(name) ~= "string" then
         return nil
     end
+
+    if fixedRanks[name] then
+        return fixedRanks[name]
+    end
+
     if string.find(name, "bank", 1, true) or string.find(name, "Bank", 1, true) then
         return 3
     end
