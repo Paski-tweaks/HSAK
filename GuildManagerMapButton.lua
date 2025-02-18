@@ -62,7 +62,7 @@ GuildManagerButton:SetScript("OnEnter", function()
     if CanEditGuildInfo() then
         GameTooltip:SetOwner(GuildManagerButton, "ANCHOR_BOTTOMRIGHT")
         GameTooltip:AddLine("Guild Manager", 1, 1, 1)
-        GameTooltip:AddLine("Left Click: Open Manager", 0.8, 0.8, 0.8)
+        GameTooltip:AddLine("Left Click: Update ranks", 0.8, 0.8, 0.8)
         GameTooltip:AddLine("Drag: Move", 0.8, 0.8, 0.8)
         GameTooltip:Show()
     else
