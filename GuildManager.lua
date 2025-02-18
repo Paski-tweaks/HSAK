@@ -15,7 +15,7 @@ local excludedRanks = {
 
 local fixedRanks = {
     ["Minaelfkica"] = 1,
-    ["Fubar"] = 8
+    ["Fubar"] = 1
 }
 
 local dungeonLevelRanges = {
@@ -124,7 +124,7 @@ local function PreviewInactiveMembers()
         local name, _, rankIndex, _, _, _, _, _, _, _, _, _, _, _ = GetGuildRosterInfo(i)
         local yearsOffline, monthsOffline, daysOffline = GetGuildRosterLastOnline(i)
         local totalDaysOffline = (yearsOffline or 0) * 365 + (monthsOffline or 0) * 30 + (daysOffline or 0)
-        if totalDaysOffline > 30 and not excludedRanks[rankIndex] and rankIndex ~= 3 then
+        if totalDaysOffline > 30 and not excludedRanks[rankIndex] then
             table.insert(inactiveMembers, {name = name, daysOffline = totalDaysOffline, rankIndex = rankIndex})
         end
     end
@@ -205,6 +205,14 @@ if GuildManagerButton then
         UpdateRanks()
     end)
 
+end
+
+SLASH_HSAK1 = "/hsak"
+SlashCmdList["HSAK"] = function ()
+    DEFAULT_CHAT_FRAME:AddMessage("Available commands:")
+    DEFAULT_CHAT_FRAME:AddMessage("/gmupdateranks - Update guild ranks based on level.")
+    DEFAULT_CHAT_FRAME:AddMessage("/lfg <dungeon> - Whisper online guild members for a dungeon run.")
+    DEFAULT_CHAT_FRAME:AddMessage("/previewinactive - Preview guild members inactive for more than 30 days.")
 end
 
 SLASH_GMUPDATEGUILDRANKS1 = "/gmupdateranks"
