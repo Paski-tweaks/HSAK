@@ -124,7 +124,7 @@ local function PreviewInactiveMembers()
         local name, _, rankIndex, _, _, _, _, _, _, _, _, _, _, _ = GetGuildRosterInfo(i)
         local yearsOffline, monthsOffline, daysOffline = GetGuildRosterLastOnline(i)
         local totalDaysOffline = (yearsOffline or 0) * 365 + (monthsOffline or 0) * 30 + (daysOffline or 0)
-        if totalDaysOffline > 30 and not excludedRanks[rankIndex] then
+        if totalDaysOffline > 30 and not excludedRanks[rankIndex] or rankIndex == 9 and totalDaysOffline > 14 then
             table.insert(inactiveMembers, {name = name, daysOffline = totalDaysOffline, rankIndex = rankIndex})
         end
     end
@@ -133,7 +133,7 @@ local function PreviewInactiveMembers()
         count = count + 1
     end
     if count > 0 then
-        DEFAULT_CHAT_FRAME:AddMessage("The following " .. count .. " members are inactive for more than 30 days:")
+        DEFAULT_CHAT_FRAME:AddMessage("The following " .. count .. " members are inactive.")
         for _, member in ipairs(inactiveMembers) do
             DEFAULT_CHAT_FRAME:AddMessage("- " .. member.name .. " (" .. member.daysOffline .. " days offline)")
         end
